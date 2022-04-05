@@ -4,25 +4,26 @@ var generateBtn = document.querySelector("#generate");
 var Password = {};
 
 var promptForLength = function() {
-    let lengthPrompt = window.prompt("How long do you want your password (min 8 chars - max 128 chars)?");
+    let lengthPrompt = window.prompt("How long do you want your password (8 - 128 characters)?");
     let userAnswer = parseInt(lengthPrompt);
     if (userAnswer >= 8 && userAnswer <= 128) {
         return userAnswer;
     } else {
-        window.alert("Improper inputs for password length.\nMust be an integer between ranges of 8 to 128.\nTry again.");
+        window.alert("Improper inputs for password length.\nMust be a number between 8 to 128.\nTry again.");
         return false;
     }
 }
 
-//source: //https://bost.ocks.org/mike/shuffle/
-function shuffle(array) {
-    var m = array.length,
-        t, i;
-    while (m) {
-        i = Math.floor(Math.random() * m--);
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
+/*source: https://bost.ocks.org/mike/shuffle/
+ (An example of the Fisher-Yates Shuffle algorithm)*/
+function mixer(array) {
+    var b = array.length,
+        a, c;
+    while (b) {
+        c = Math.floor(Math.random() * b--);
+        a = array[b];
+        array[b] = array[c];
+        array[c] = a;
     }
     return array;
 }
@@ -40,8 +41,8 @@ var charGen = function(howMany, option) {
         prompt = window.prompt("Do you want to include special characters in your password (Y/N)?");
     }
 
-    let charArray = shuffle(alphabet);
-    let specArray = shuffle(specChars);
+    let charArray = mixer(alphabet);
+    let specArray = mixer(specChars);
     let resultsArray = [];
     if (prompt.toLowerCase() == "y") {
         for (let i = 0; i < howMany; i++) {
@@ -66,7 +67,7 @@ var charGen = function(howMany, option) {
 
 var numGen = function(howMany) {
     let prompt = window.prompt("Do you want numbers for your password?");
-    let intArray = shuffle(ints);
+    let intArray = mixer(ints);
     let resultsArray = []
     if (prompt.toLowerCase() == "y") {
         Password.int = "yes";
@@ -85,9 +86,9 @@ var ints = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 var matching = function(findFirstYes) {
     let temp = "";
-    let charArray = shuffle(alphabet);
-    let specArray = shuffle(specChars);
-    let intArray = shuffle(ints);
+    let charArray = mixer(alphabet);
+    let specArray = mixer(specChars);
+    let intArray = mixer(ints);
     switch (findFirstYes) {
         case 0:
             temp = charArray[0];
@@ -161,7 +162,7 @@ function writePassword() {
             } while (workingArray.length != Password.length);
         }
 
-        workingArray = shuffle(workingArray);
+        workingArray = mixer(workingArray);
         let answer = workingArray.join("");
         var passwordText = document.querySelector("#password");
         passwordText.value = answer;
