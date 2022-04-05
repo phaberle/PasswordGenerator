@@ -38,8 +38,8 @@ var charGen = function(howMany, option) {
         prompt = window.prompt("Do you want to include uppercase letters in your password (Y/N)?");
     } else if (option == "spec") {
         prompt = window.prompt("Do you want to include special characters in your password (Y/N)?");
-
     }
+
     let charArray = shuffle(alphabet);
     let specArray = shuffle(specChars);
     let resultsArray = [];
@@ -58,6 +58,7 @@ var charGen = function(howMany, option) {
             }
         }
     } else {
+
         resultsArray.push("N/A");
     }
     return resultsArray;
@@ -89,16 +90,16 @@ var matching = function(findFirstYes) {
     let intArray = shuffle(ints);
     switch (findFirstYes) {
         case 0:
-            temp.push(charArray[0]);
+            temp = charArray[0];
             break;
         case 1:
-            temp.push(charArray[0].toUpperCase());
+            temp = charArray[0].toUpperCase();
             break;
         case 2:
-            temp.push(specArray[0]);
+            temp = specArray[0];
             break;
         case 3:
-            temp.push(intArray[0]);
+            temp = intArray[0];
             break;
         default:
             break;
@@ -106,8 +107,12 @@ var matching = function(findFirstYes) {
     return temp;
 }
 
-var getIndex = function(array) {
-    return array == "yes";
+var getIndex = function(array, searchTerm) {
+    for (i = 0; i < array.length; i++) {
+        if (array[i] == "yes") {
+            return i;
+        }
+    }
 }
 
 // Write password to the #password input
@@ -133,6 +138,8 @@ function writePassword() {
 
         Password.resultsArray = [].concat(Password.lowerCaseOption, Password.upperCaseOption, Password.numericOption, Password.specCharOption);
         let workingArray = [];
+
+        //transition from Password.resultsArray to workingArray where "N/A" is removed
         for (let i = 0; i < Password.resultsArray.length; i++) {
             if (Password.resultsArray[i] != "N/A") {
                 workingArray.push(Password.resultsArray[i]);
@@ -140,15 +147,19 @@ function writePassword() {
         }
         let workingArrayLengthEqualsPasswordLength = workingArray.length == Password.length ? true : false;
         let userOptions = [Password.lc, Password.uc, Password.spec, Password.int];
-        let findFirstYes;
+
         if (workingArrayLengthEqualsPasswordLength == false) {
-            findFirstYes = getIndex(userOptions);
+            let findFirstYes = getIndex(userOptions, "yes");
+            do {
+                if (workingArray.length > Password.length) {
+                    workingArray.shift();
+                }
+                if (workingArray.length < Password.length) {
+                    let tempStr = matching(findFirstYes);
+                    workingArray.push(tempStr);
+                }
+            } while (workingArray.length != Password.length);
         }
-        let temp = [];
-        do {
-            temp.push(matching(findFirstYes));
-        } while (temp.length != Password.length);
-        workingArray = [].concat(temp);
 
         workingArray = shuffle(workingArray);
         let answer = workingArray.join("");
@@ -156,21 +167,6 @@ function writePassword() {
         passwordText.value = answer;
     }
 }
-
-
-
-// let myLogging = function() {
-//     console.log("lc- " + Password.lowerCaseOption);
-//     console.log("uc- " + Password.upperCaseOption);
-//     console.log("int- " + Password.numericOption);
-//     console.log("spec- " + Password.specCharOption);
-//     console.log("password results array " + Password.resultsArray);
-//     console.log(Password.uc);
-// }
-
-
-
-
 
 // Add event listener to generate button
 generateBtn.addEventListener("click", writePassword);
